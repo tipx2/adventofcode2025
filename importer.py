@@ -3,7 +3,7 @@ import os.path
 from datetime import datetime
 
 headers = {
-  "User-Agent" : "https://github.com/tipx2/adventofcode2024 by tipx2gaming [AT] gmail [DOT] com" 
+  "User-Agent" : "https://github.com/tipx2/adventofcode2025 by tipx2gaming [AT] gmail [DOT] com" 
 }
 
 if not os.path.isfile("session.txt"):
