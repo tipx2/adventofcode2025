@@ -1,4 +1,4 @@
-with open("day09/example.txt") as f:
+with open("day09/input9.txt") as f:
   lines = [x.strip() for x in f.readlines()]
 
 red_tiles = [(int(x), int(y)) for x,y in [z.split(",") for z in lines]]
@@ -41,8 +41,6 @@ all_rects = [(area(red_tiles[x],red_tiles[y]), red_tiles[x],red_tiles[y]) for x 
 all_rects.sort(reverse=True)
 
 for i, pair in enumerate(all_rects):
-  if i % 1000 == 0:
-    print("aryehvalue:", i, "|||", pair[0])
   x1,y1 = pair[1]
   x2,y2 = pair[2]
   
