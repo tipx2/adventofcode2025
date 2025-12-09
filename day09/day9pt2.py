@@ -27,10 +27,12 @@ for i in range(len(red_tiles)):
     new = (initial[0] + (delta[0] * times), initial[1] + (delta[1] * times))
 
 
-def debug_draw():
-  for y in range(15):
+def debug_draw(x1,y1,x2,y2):
+  for y in range(10):
     for x in range(15):
-      if (x,y) in red_tiles:
+      if (x,y) == (x1,y1) or (x,y) == (x2,y2):
+        print("@", end="")
+      elif (x,y) in red_tiles:
         print("#", end="")
       elif (x,y) in green_tiles:
         print("X", end="")
@@ -44,18 +46,36 @@ for l in red_tiles:
   green_tiles.add(l)
 
 def valid(x1,y1,x2,y2):
-  for x in range(min(x1, x2), max(x1, x2) + 1):
-    if (x,y1) in green_tiles and (x+1,y1) not in green_tiles and (x-1,y1) not in green_tiles:
-      return False
-    if (x,y2) in green_tiles and (x+1,y2) not in green_tiles and (x-1,y2) not in green_tiles:
-      return False
-
-  for y in range(min(y1, y2), max(y1, y2) + 1):
-    if (x1,y) in green_tiles and (x1,y+1) not in green_tiles and (x1,y-1) not in green_tiles:
-      return False
-    if (x2,y) in green_tiles and (x2,y+1) not in green_tiles and (x2,y-1) not in green_tiles:
-      return False
+  flippedx1 = False
+  flippedx2 = False
+  for x in range(min(x1, x2)+1, max(x1, x2)):
+    if ((x,y1) in green_tiles) != ((x-1,y1) in green_tiles):
+      if flippedx1:
+        return False
+      else:
+        flippedx1 = True
     
+    if ((x,y2) in green_tiles) != ((x-1,y2) in green_tiles):
+      if flippedx2:
+        return False
+      else:
+        flippedx2 = True
+  
+  flippedy1 = False
+  flippedy2 = False
+  for y in range(min(y1, y2)+1, max(y1, y2)):
+    if ((x1,y) in green_tiles) != ((x1,y-1) in green_tiles):
+      if flippedy1:
+        return False
+      else:
+        flippedy1 = True
+    
+    if ((x2,y) in green_tiles) != ((x2,y-1) in green_tiles):
+      if flippedy2:
+        return False
+      else:
+        flippedy2 = True
+
   return True
 
 largest = 0
@@ -65,12 +85,11 @@ for i in range(len(red_tiles)):
     x1,y1 = red_tiles[i]
     x2,y2 = red_tiles[j]
 
-    if not valid(x1,y1,x2,y2):
-      continue
-
     area = (abs(x2 - x1) + 1) * (abs(y2 - y1) + 1)
     if area > largest:
-      largest = area
-      print(x1,y1,x2,y2, area)
+      if valid(x1,y1,x2,y2):
+        debug_draw(x1,y1,x2,y2)
+        print(x1,y1,x2,y2)
+        largest = area
 
 print(largest)
