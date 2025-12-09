@@ -2,11 +2,13 @@ with open("day09/example.txt") as f:
   lines = [x.strip() for x in f.readlines()]
 
 red_tiles = [(int(x), int(y)) for x,y in [z.split(",") for z in lines]]
-green_tiles = set()
+polygon = []
 
 for i in range(len(red_tiles)):
   target = red_tiles[i+1] if i != len(red_tiles)-1 else red_tiles[0]
   initial = red_tiles[i]
+  
+  polygon.append(initial)
   
   delta = None
   
@@ -22,74 +24,28 @@ for i in range(len(red_tiles)):
   times = 1
   new = (initial[0] + (delta[0] * times), initial[1] + (delta[1] * times))
   while new != target:
-    green_tiles.add(new)
+    polygon.append(new)
     times += 1
     new = (initial[0] + (delta[0] * times), initial[1] + (delta[1] * times))
 
-
-def debug_draw(x1,y1,x2,y2):
-  for y in range(10):
-    for x in range(15):
-      if (x,y) == (x1,y1) or (x,y) == (x2,y2):
-        print("@", end="")
-      elif (x,y) in red_tiles:
-        print("#", end="")
-      elif (x,y) in green_tiles:
-        print("X", end="")
-      else:
-        print(".", end="")
-    print()
-
-# debug_draw()
-
-for l in red_tiles:
-  green_tiles.add(l)
-
 def valid(x1,y1,x2,y2):
-  flippedx1 = False
-  flippedx2 = False
-  for x in range(min(x1, x2)+1, max(x1, x2)):
-    if ((x,y1) in green_tiles) != ((x-1,y1) in green_tiles):
-      if flippedx1:
-        return False
-      else:
-        flippedx1 = True
-    
-    if ((x,y2) in green_tiles) != ((x-1,y2) in green_tiles):
-      if flippedx2:
-        return False
-      else:
-        flippedx2 = True
-  
-  flippedy1 = False
-  flippedy2 = False
-  for y in range(min(y1, y2)+1, max(y1, y2)):
-    if ((x1,y) in green_tiles) != ((x1,y-1) in green_tiles):
-      if flippedy1:
-        return False
-      else:
-        flippedy1 = True
-    
-    if ((x2,y) in green_tiles) != ((x2,y-1) in green_tiles):
-      if flippedy2:
-        return False
-      else:
-        flippedy2 = True
-
+  for x,y in polygon:
+    if min(x1, x2) < x < max(x1, x2) and min(y1, y2) < y < max(y1, y2):
+      return False
   return True
 
-largest = 0
+def area(c1,c2):
+  return (abs(c1[0] - c2[0]) + 1) * (abs(c1[1] - c2[1]) + 1)
 
-for i in range(len(red_tiles)):
-  for j in range(i+1, len(red_tiles)):
-    x1,y1 = red_tiles[i]
-    x2,y2 = red_tiles[j]
+all_rects = [(area(red_tiles[x],red_tiles[y]), red_tiles[x],red_tiles[y]) for x in range(len(red_tiles)) for y in range(x+1, len(red_tiles))]
+all_rects.sort(reverse=True)
 
-    area = (abs(x2 - x1) + 1) * (abs(y2 - y1) + 1)
-    if area > largest:
-      if valid(x1,y1,x2,y2):
-        debug_draw(x1,y1,x2,y2)
-        print(x1,y1,x2,y2)
-        largest = area
-
-print(largest)
+for i, pair in enumerate(all_rects):
+  if i % 1000 == 0:
+    print("aryehvalue:", i, "|||", pair[0])
+  x1,y1 = pair[1]
+  x2,y2 = pair[2]
+  
+  if valid(x1,y1,x2,y2):
+    print(pair[0])
+    break
