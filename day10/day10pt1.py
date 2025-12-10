@@ -1,35 +1,34 @@
 import re
-from functools import cache
-with open("day10/example.txt") as f:
-  lines = [x.strip() for x in f.readlines()]
+with open("day10/input10.txt") as f:
+    lines = [x.strip() for x in f.readlines()]
 
-def switch(current, button):
-  current = list(current)
-  for b in button:
-    if b in current:
-      current.remove(b)
-    else:
-      current.append(b)
-  return tuple(sorted(current))
 
-@cache
-def dp(current, target, buttons):
-  if current == target:
-    return 0
-  else:
-    cheapest = 99999999999
-    for b in buttons:
-      result = 1 + dp(switch(current, b), target, buttons)
-      cheapest = min(cheapest, result)
-    return cheapest
-
+total = 0
 for line in lines:
-  target_string = re.search("\[.+\]", line).group().strip("[]")
-  target_lights = []
-  for i in range(len(target_string)):
-    if target_string[i] == "#":
-      target_lights.append(i)
-  buttons = tuple(tuple(int(z) for z in x.strip("()").split(",")) for x in re.findall("\([,\d]+\)", line))
-  joltage = [int(x) for x in re.search("\{[,\d]+\}", line).group().strip("{}").split(",")]
-  print(dp(tuple(), tuple(target_lights), buttons))
+    target_string = re.search("\[.+\]", line).group().strip("[]")
+    target_lights = 0
+    for i in range(len(target_string)):
+        if target_string[i] == "#":
+            target_lights = target_lights | (1<<i)
+   
+    buttons = []
+    for b_str in re.findall("\([,\d]+\)", line):
+        button = 0
+        for s in b_str.strip("()").split(","):
+            button = button | (1<<int(s))
+        buttons.append(button)
 
+    # bfs
+    queue = [(0, 0)]
+    visited = set()
+    while queue:
+        value, clicks = queue.pop(0)
+        if value == target_lights:
+            total += clicks
+            break
+        for b in buttons:
+            new = value^b
+            if new not in visited:
+                visited.add(new)
+                queue.append((new, clicks+1))
+print(total)
