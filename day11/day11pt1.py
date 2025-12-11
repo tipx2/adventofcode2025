@@ -1,4 +1,3 @@
-from functools import cache
 with open("day11/input11.txt") as f:
     lines = [x.strip() for x in f.readlines()]
 
@@ -7,20 +6,18 @@ for line in lines:
     key, values = line.split(": ")
     adj[key] = values.split(" ")
 
-@cache
-def dfs(current, end, endbounds):
+queue = ["you"]
 
-    if current in endbounds:
-        return 0
-    elif current == end:
-        return 1
-    else:
-        return sum([dfs(a, end, endbounds) for a in adj[current]])
-           
+paths = 0
 
-first = dfs("svr", "fft", frozenset(["nno", "idq", "uur", "vpw", "dsj"]))
-second = dfs("fft", "dac", frozenset(["vms", "biw", "you"]))
-third = dfs("dac", "out", frozenset())
+while queue:
+    current = queue.pop(0)
+    if current == "out":
+        paths += 1
+        continue
+   
+    for a in adj[current]:
+        queue.append(a)
 
-print(first, second, third)
-print(first * second * third)
+    #print(queue)
+print(paths)
